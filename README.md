@@ -18,17 +18,17 @@ python -m main --image1 <path_to_image1> --image2 <path_to_image2> [options]
 
 ## Arguments
 
-- --image1: Path to the first image (required).
-- --image2: Path to the second image (required).
-- --method: Comparison method to use. Options include:
-    - deep: Use deep learning for similarity comparison.
-    - hash: Use perceptual hashing methods.
-    - sift: Use SIFT feature matching.
-    - orb: Use ORB feature matching.
-    - hist: Use histogram comparison.
-- --model_path: Path to the pre-trained model (for deep learning method). Optional.
-- --hash_size: Hash size for perceptual hashing methods. Default is 8. Optional.
-- --no_visualization: Disable results visualization. Optional.
+- `--image1`: Path to the first image (required).
+- `--image2`: Path to the second image (required).
+- `--method`: Comparison method to use. Options include:
+    - `deep`: Use deep learning for similarity comparison.
+    - `hash`: Use perceptual hashing methods.
+    - `sift`: Use SIFT feature matching.
+    - `orb`: Use ORB feature matching.
+    - `hist`: Use histogram comparison.
+- `--model_path`: Path to the pre-trained model (for deep learning method). Optional.
+- `--hash_size`: Hash size for perceptual hashing methods. Default is 8. Optional.
+- `--no_visualization`: Disable results visualization. Optional.
 
 # Example Commands
 
