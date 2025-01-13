@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 from PIL import Image
 import matplotlib.pyplot as plt
 import cv2
@@ -13,7 +13,7 @@ class SimilarityVisualizer:
         self,
         image1_path: str,
         image2_path: str,
-        similarities: Dict[str, float],
+        similarities: Dict[str, Union[float, tuple[float, tuple[np.ndarray, np.ndarray]]]],
         keypoints1: List | None = None,
         keypoints2: List | None = None,
         good_matches: List | None = None,
@@ -23,9 +23,28 @@ class SimilarityVisualizer:
                 image1_path, image2_path, keypoints1, keypoints2, good_matches
             )
         else:
-            fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=self.figsize)
-            self._plot_images(ax1, ax2, image1_path, image2_path)
-            self._plot_similarities(ax3, similarities)
+            hash_similarities = {}
+            other_similarities = {}
+            
+            for method, value in similarities.items():
+                if isinstance(value, tuple):
+                    hash_similarities[method] = value
+                else:
+                    other_similarities[method] = value
+
+            if hash_similarities:
+                fig = plt.figure(figsize=(15, 10))
+                ax1 = plt.subplot2grid((2, 2), (0, 0))
+                ax2 = plt.subplot2grid((2, 2), (0, 1))
+                self._plot_images(ax1, ax2, image1_path, image2_path)
+                
+                ax3 = plt.subplot2grid((2, 2), (1, 0), colspan=2)
+                self._plot_hashes(ax3, hash_similarities)
+            else:
+                fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=self.figsize)
+                self._plot_images(ax1, ax2, image1_path, image2_path)
+                self._plot_similarities(ax3, other_similarities)
+            
             plt.tight_layout()
             plt.show()
 
@@ -76,9 +95,9 @@ class SimilarityVisualizer:
         ax2.axis("off")
 
     def _plot_similarities(
-            self,
-            ax: plt.Axes,
-            similarities: Dict[str, float]
+        self,
+        ax: plt.Axes,
+        similarities: Dict[str, float]
     ) -> None:
         methods = list(similarities.keys())
         scores = list(similarities.values())
@@ -86,3 +105,33 @@ class SimilarityVisualizer:
         ax.bar(methods, scores)
         ax.set_title("Similarity Scores\n")
         plt.setp(ax.get_xticklabels(), rotation=45)
+
+    def _plot_hashes(
+        self,
+        ax: plt.Axes,
+        hash_similarities: Dict[str, tuple[float, tuple[np.ndarray, np.ndarray]]]
+    ) -> None:
+        n_hashes = len(hash_similarities)
+        current_pos = 0
+        
+        for method, (score, (hash1, hash2)) in hash_similarities.items():
+            hash1_img = hash1.reshape((8, 8))
+            hash2_img = hash2.reshape((8, 8))
+            
+            ax_hash1 = ax.inset_axes([0.3, 1.0 - (current_pos + 1) * 0.25, 0.15, 0.2])
+            ax_hash2 = ax.inset_axes([0.55, 1.0 - (current_pos + 1) * 0.25, 0.15, 0.2])
+            
+            ax_hash1.imshow(hash1_img, cmap='binary')
+            ax_hash2.imshow(hash2_img, cmap='binary')
+            
+            ax_hash1.axis('off')
+            ax_hash2.axis('off')
+            
+            ax.text(0.5, 1.0 - current_pos * 0.25 - 0.1, 
+                    f"{method}\nScore: {score:.4f}",
+                    ha='center', va='bottom')
+            
+            current_pos += 1
+        
+        ax.axis('off')
+        ax.set_title("Hash Visualizations")

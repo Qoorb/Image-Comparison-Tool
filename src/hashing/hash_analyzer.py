@@ -61,24 +61,48 @@ class ImageHashAnalyzer:
 
     def compare_images(
         self, image1_path: Union[str, Path], image2_path: Union[str, Path]
-    ) -> Dict[str, float]:
+    ) -> Dict[str, tuple[float, tuple[np.ndarray, np.ndarray]]]:
         return {
-            "Average Hash": self._hamming_distance(
-                self.compute_average_hash(image1_path),
-                self.compute_average_hash(image2_path),
+            "Average Hash": (
+                self._hamming_distance(
+                    self.compute_average_hash(image1_path),
+                    self.compute_average_hash(image2_path),
+                ),
+                (
+                    self.compute_average_hash(image1_path),
+                    self.compute_average_hash(image2_path)
+                )
             ),
-            "Difference Hash": self._hamming_distance(
-                self.compute_difference_hash(image1_path),
-                self.compute_difference_hash(image2_path),
+            "Difference Hash": (
+                self._hamming_distance(
+                    self.compute_difference_hash(image1_path),
+                    self.compute_difference_hash(image2_path),
+                ),
+                (
+                    self.compute_difference_hash(image1_path),
+                    self.compute_difference_hash(image2_path)
+                )
             ),
-            "Perceptual Hash": self._hamming_distance(
-                self.compute_perceptual_hash(image1_path),
-                self.compute_perceptual_hash(image2_path),
+            "Perceptual Hash": (
+                self._hamming_distance(
+                    self.compute_perceptual_hash(image1_path),
+                    self.compute_perceptual_hash(image2_path),
+                ),
+                (
+                    self.compute_perceptual_hash(image1_path),
+                    self.compute_perceptual_hash(image2_path)
+                )
             ),
-            "Wavelet Hash": float(
-                abs(
-                    self.compute_wavelet_hash(image1_path)
-                    - self.compute_wavelet_hash(image2_path)
+            "Wavelet Hash": (
+                float(
+                    abs(
+                        self.compute_wavelet_hash(image1_path)
+                        - self.compute_wavelet_hash(image2_path)
+                    )
+                ),
+                (
+                    np.array(self.compute_wavelet_hash(image1_path).hash),
+                    np.array(self.compute_wavelet_hash(image2_path).hash)
                 )
             ),
         }

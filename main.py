@@ -1,5 +1,6 @@
 import argparse
 from typing import Dict
+import numpy as np
 
 from src.deep_learning import ImageSimilarityAnalyzer
 from src.hashing import ImageHashAnalyzer
@@ -56,7 +57,7 @@ def compute_deep_learning_similarity(
 
 def compute_hash_similarity(
     image1_path: str, image2_path: str, hash_size: int = 8
-) -> Dict[str, float]:
+) -> Dict[str, tuple[float, tuple[np.ndarray, np.ndarray]]]:
     analyzer = ImageHashAnalyzer(hash_size=hash_size)
     return analyzer.compare_images(image1_path, image2_path)
 
@@ -100,7 +101,7 @@ def compute_histogram_similarity(
 
 def main() -> None:
     args = parse_arguments()
-    similarities: Dict[str, float] = {}
+    similarities: Dict[str, float | tuple[float, tuple[np.ndarray, np.ndarray]]] = {}
 
     if args.method == "deep":
         similarities.update(
@@ -142,8 +143,14 @@ def main() -> None:
         )
 
     print("\nSimilarity scores:")
-    for method, score in similarities.items():
-        print(f"{method}: {score:.4f}")
+    for method, value in similarities.items():
+        if isinstance(value, tuple):
+            # for hash
+            score, _ = value
+            print(f"{method}: {score:.4f}")
+        else:
+            # for other methods
+            print(f"{method}: {value:.4f}")
 
     if not args.no_visualization and args.method not in ["sift", "orb"]:
         visualizer = SimilarityVisualizer()
