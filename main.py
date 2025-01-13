@@ -99,9 +99,12 @@ def compute_feature_matching_similarity(
     if visualize:
         visualizer = SimilarityVisualizer()
         visualizer.visualize_comparison(
-            image1_path, image2_path,
-            result, keypoints1,
-            keypoints2, good_matches
+            image1_path,
+            image2_path,
+            result,
+            keypoints1,
+            keypoints2,
+            good_matches
         )
 
     return result
@@ -117,7 +120,10 @@ def compute_histogram_similarity(
 
 def main() -> None:
     args = parse_arguments()
-    similarities: Dict[str, float | tuple[float, tuple[np.ndarray, np.ndarray]]] = {}
+    similarities: Dict[
+        str,
+        float | tuple[float, tuple[np.ndarray, np.ndarray]]
+    ] = {}
 
     if args.method == "deep":
         similarities.update(
