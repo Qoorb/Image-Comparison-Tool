@@ -30,7 +30,7 @@ class HistogramAnalyzer:
         results = {}
         for method_name, method in self.comparison_methods:
             score = cv2.compareHist(hist1, hist2, method)
-            # Нормализация
+            # Normalization
             if method == cv2.HISTCMP_INTERSECT:
                 score = score / (hist1.shape[0] * hist1.shape[1])
             elif method in [cv2.HISTCMP_CHISQR, cv2.HISTCMP_BHATTACHARYYA]:
