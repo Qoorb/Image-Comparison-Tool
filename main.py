@@ -1,12 +1,24 @@
 import argparse
 from typing import Dict
 import numpy as np
+import time
 
 from src.deep_learning import ImageSimilarityAnalyzer
 from src.hashing import ImageHashAnalyzer
 from src.utils import SimilarityVisualizer
 from src.feature_matching import SIFTMatcher, ORBMatcher
 from src.histogram import HistogramAnalyzer
+
+
+def measure_time(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        print(f"\nВремя выполнения {func.__name__}: {execution_time:.4f} секунд")
+        return result
+    return wrapper
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -47,6 +59,7 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
+@measure_time
 def compute_deep_learning_similarity(
     image1_path: str, image2_path: str, model_path: str | None = None
 ) -> Dict[str, float]:
@@ -55,6 +68,7 @@ def compute_deep_learning_similarity(
     return {"Siamese Network": similarity}
 
 
+@measure_time
 def compute_hash_similarity(
     image1_path: str, image2_path: str, hash_size: int = 8
 ) -> Dict[str, tuple[float, tuple[np.ndarray, np.ndarray]]]:
@@ -62,6 +76,7 @@ def compute_hash_similarity(
     return analyzer.compare_images(image1_path, image2_path)
 
 
+@measure_time
 def compute_feature_matching_similarity(
     image1_path: str,
     image2_path: str,
@@ -95,6 +110,7 @@ def compute_feature_matching_similarity(
     return result
 
 
+@measure_time
 def compute_histogram_similarity(
     image1_path: str, image2_path: str
 ) -> Dict[str, float]:
